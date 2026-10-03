@@ -1,646 +1,18 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <title>Dripclean Laundry | Laundry with care</title>
-        <link rel="stylesheet" href="assets/colors.css">
-<style>
-:root {
-    --ink: var(--brand-ink);
-    --leaf: var(--brand-sky);
-    --paper: var(--brand-paper);
-    --muted: var(--brand-muted);
-    --line: #dceef5;
-    --serif: 'Trebuchet MS', 'Segoe UI', sans-serif;
-}
-* {
-    box-sizing: border-box;
-}
-html {
-    scroll-behavior: smooth;
-}
-body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font: 15px/1.7 'Segoe UI', Arial, sans-serif;
-}
-.wrap {
-    width: min(1120px, calc(100% - 48px));
-    margin: auto;
-}
-a {
-    color: inherit;
-    text-decoration: none;
-}
-.top {
-    height: 96px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-.brand {
-    display: block;
-    flex-shrink: 0;
-}
-.brand img {
-    display: block;
-    width: 190px;
-    height: auto;
-}
-.nav {
-    display: flex;
-    gap: 30px;
-    font-size: 12px;
-}
-.nav a:hover {
-    color: var(--brand-blue);
-}
-.btn {
-    display: inline-block;
-    border: 0;
-    border-radius: 99px;
-    padding: 12px 23px;
-    background: var(--brand-blue);
-    color: white;
-    font-size: 12px;
-    font-weight: 650;
-    cursor: pointer;
-    transition: .2s;
-}
-.btn:hover {
-    background: var(--brand-hover);
-    transform: translateY(-2px);
-}
-:focus-visible {
-    outline: 3px solid var(--brand-blue);
-    outline-offset: 4px;
-}
-.hero {
-    position: relative;
-    padding: 64px 0 74px;
-    display: grid;
-    grid-template-columns: 1fr 1.05fr;
-    gap: 40px;
-    align-items: center;
-    min-height: 550px;
-}
-.hero::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: -96px;
-    bottom: 0;
-    left: min(-24px, calc((1120px - 100vw) / 2));
-    right: min(-24px, calc((1120px - 100vw) / 2));
-    background: linear-gradient(110deg, #e1f5ff, var(--brand-soft) 60%, var(--brand-paper));
-}
-.eyebrow {
-    color: var(--brand-blue);
-    text-transform: uppercase;
-    letter-spacing: 1.8px;
-    font-size: 10px;
-    font-weight: 800;
-}
-.hero h1 {
-    font: 800 clamp(36px, 4vw, 51px)/1.28 var(--serif);
-    letter-spacing: -1.7px;
-    margin: 14px 0 22px;
-}
-.hero h1 span {
-    color: var(--brand-blue);
-}
-.hero h1 em {
-    color: var(--brand-blue);
-    font-style: normal;
-    border-bottom: 3px solid var(--brand-sky);
-    border-radius: 15%;
-}
-.hero p {
-    max-width: 390px;
-    font-size: 13px;
-    line-height: 1.9;
-}
-.hero-art {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 26px;
-    background: #d7f0f8;
-    border: 12px solid #ffffff70;
-    outline: 1px dashed #abc5c9;
-    outline-offset: 12px;
-}
-.actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-top: 27px;
-}
-.actions a + a {
-    font-size: 12px;
-    color: var(--brand-blue);
-}
-.ticks {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 30px;
-}
-.services, .dashboard, .flyer, .process {
-    padding: 70px 0;
-}
-h2 {
-    font: 800 34px/1.35 var(--serif);
-    letter-spacing: -.8px;
-    margin: 8px 0 30px;
-}
-h2 em {
-    color: var(--brand-blue);
-    font-style: normal;
-}
-.services h2, .services > .wrap > .eyebrow, .process h2 {
-    text-align: center;
-}
-.cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 23px;
-}
-.card, .panel {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 26px;
-}
-.card {
-    text-align: center;
-    box-shadow: 0 10px 30px #348bad08;
-}
-.card::before {
-    content: '\1F9FA';
-    display: grid;
-    place-items: center;
-    height: 135px;
-    background: #e5f5fc;
-    border-radius: 10px;
-    font-size: 62px;
-    margin: -12px -12px 24px;
-}
-.card:nth-child(2)::before {
-    content: '\1F454';
-    background: var(--brand-soft);
-}
-.card:nth-child(3)::before {
-    content: '\1FAE7';
-}
-.card.wash-fold-card::before,
-.card.delicate-care-card::before {
-    display: none;
-}
-.service-photo {
-    display: block;
-    width: calc(100% + 24px);
-    height: 160px;
-    margin: -12px -12px 24px;
-    border-radius: 10px;
-    object-fit: cover;
-}
-.card b {
-    font-size: 17px;
-}
-.card p, .panel p {
-    font-size: 12px;
-    line-height: 1.8;
-    color: var(--muted);
-}
-.price {
-    font: 700 20px var(--serif);
-    color: var(--brand-blue);
-}
-.price small {
-    font-size: 11px;
-    font-weight: 400;
-}
-.process {
-    background: #e9f7fd;
-}
-.process-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
-    text-align: center;
-    padding-top: 18px;
-}
-.process-icon {
-    display: grid;
-    place-items: center;
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 25px;
-    border-radius: 50%;
-    background: #65c7e9;
-    border: 5px solid #e9f7fd;
-    outline: 1px dashed var(--brand-sky);
-    outline-offset: 6px;
-    font-size: 40px;
-}
-.process h3 {
-    font-size: 16px;
-    margin-bottom: 8px;
-}
-.process p {
-    font-size: 12px;
-    color: var(--muted);
-}
-.dashboard {
-    background: var(--brand-paper);
-}
-.dashboard > .wrap > h2, .dashboard > .wrap > .eyebrow {
-    text-align: center;
-}
-.dashgrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-    align-items: start;
-}
-.panel h3 {
-    font: 700 24px var(--serif);
-    margin: 0 0 20px;
-}
-.fieldrow {
-    display: flex;
-    gap: 10px;
-    margin: 10px 0 16px;
-}
-.fieldrow input, .fieldrow select {
-    min-width: 0;
-    flex: 1;
-    border: 1px solid var(--line);
-    background: #edf8fd;
-    border-radius: 6px;
-    padding: 12px;
-    font: 12px 'Segoe UI', sans-serif;
-}
-.book {
-    background: var(--brand-blue);
-    color: white;
-    border-color: var(--brand-blue);
-}
-.book label {
-    display: block;
-    font-size: 11px;
-}
-.book .btn {
-    background: var(--brand-blue);
-    width: 100%;
-    border-radius: 6px;
-}
-.book p {
-    color: #ecfaff !important;
-}
-.result {
-    display: none;
-    padding: 16px;
-    background: #edf8fd;
-    border-radius: 10px;
-    font-size: 12px;
-    overflow-wrap: anywhere;
-}
-.pill {
-    float: right;
-    background: #d4f1df;
-    padding: 5px 9px;
-    border-radius: 99px;
-    font-size: 9px;
-    font-weight: bold;
-}
-.steps {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 16px;
-    color: var(--brand-blue);
-    font-size: 10px;
-}
-.flyerbox {
-    display: grid;
-    grid-template-columns: 1fr .7fr;
-    border-radius: 18px;
-    overflow: hidden;
-    background: #e5f5fc;
-}
-.flyercopy {
-    padding: 38px;
-}
-.flyercopy h2 {
-    font-size: 38px;
-    line-height: 1.2;
-}
-.flyercopy p {
-    font-size: 13px;
-    color: var(--muted);
-}
-.flyervis {
-    background: var(--brand-selected);
-    position: relative;
-    min-height: 240px;
-    overflow: hidden;
-}
-.flyervis img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 60%;
-}
-.circle {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 85px;
-    height: 85px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    text-align: center;
-    font-size: 10px;
-    font-weight: bold;
-    background: var(--brand-blue);
-    color: white;
-}
-footer {
-    border-top: 1px solid var(--line);
-    padding: 25px 0;
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    font-size: 11px;
-    color: var(--muted);
-}
-.toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    width: max-content;
-    max-width: calc(100% - 32px);
-    transform: translate(-50%, 30px);
-    opacity: 0;
-    background: #28546a;
-    color: white;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 12px;
-    transition: .2s;
-    pointer-events: none;
-}
-.toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
-}
-@media (max-width: 720px) {
-    .brand img {
-    width: 160px;
-}
-    .top {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 20px 0;
-    gap: 16px;
-}
-    .nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    gap: 24px;
-}
-    .hero {
-    grid-template-columns: 1fr;
-    gap: 42px;
-    padding: 35px 0 50px;
-}
-    .hero::before {
-    top: -150px;
-}
-    .hero-art {
-    width: 90%;
-    margin: auto;
-}
-    .cards, .dashgrid, .flyerbox, .process-grid {
-    grid-template-columns: 1fr;
-}
-    .process-grid {
-    gap: 28px;
-}
-    .wrap {
-    width: calc(100% - 40px);
-}
-    .hero h1 {
-    font-size: 39px;
-}
-    h2 {
-    font-size: 28px;
-}
-    .services, .dashboard, .flyer, .process {
-    padding: 45px 0;
-}
-    .fieldrow {
-    flex-wrap: wrap;
-}
-    .fieldrow input, .fieldrow select {
-    flex-basis: 100%;
-}
-    footer {
-    flex-direction: column;
-}
-}
-@media (prefers-reduced-motion: reduce) {
-    html {
-    scroll-behavior: auto;
-}
-    * {
-    transition: none;
-}
-}
-
-.pricing {
-    padding: 75px 0;
-    background-color: var(--brand-soft);
-    background-image:
-        linear-gradient(180deg, rgba(232, 247, 255, .92) 0px, rgba(232, 247, 255, .88) 420px, rgba(232, 247, 255, .96) 900px, var(--brand-soft) 1100px),
-        url('assets/laundry-water-background.jpg');
-    background-position: center top;
-    background-size: 100% 100%, 100% auto;
-    background-repeat: no-repeat;
-}
-.pricing-heading {
-    max-width: 660px;
-    margin: 0 auto 36px;
-    text-align: center;
-}
-.pricing-heading h2 {
-    margin-bottom: 14px;
-    color: var(--brand-ink);
-}
-.pricing-heading h2 em {
-    color: var(--brand-blue);
-}
-.pricing-heading .eyebrow {
-    color: var(--brand-blue);
-}
-.pricing-heading p {
-    color: var(--brand-muted);
-    font-size: 13px;
-}
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-    align-items: start;
-}
-.pricing-column {
-    display: grid;
-    gap: 24px;
-    min-width: 0;
-}
-.price-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    border: 1px solid var(--brand-border);
-    border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 10px 28px #16678608;
-}
-.price-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image: url('assets/dripclean-logo.png');
-    background-position: center;
-    background-repeat: repeat-y;
-    background-size: 90% auto;
-    opacity: .065;
-    pointer-events: none;
-}
-.price-card table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    font-size: 13px;
-    color: var(--brand-ink);
-}
-.price-card caption {
-    padding: 18px 20px;
-    background: var(--brand-navy);
-    color: #ffffff;
-    text-align: left;
-    font: 700 20px var(--serif);
-}
-.price-card th,
-.price-card td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #dcecf280;
-    vertical-align: middle;
-}
-.price-card thead th {
-    background: var(--brand-soft);
-    color: var(--brand-navy);
-    font-size: 11px;
-    font-weight: 700;
-    text-align: right;
-}
-.price-card thead th:first-child {
-    width: 48%;
-    text-align: left;
-}
-.price-card tbody th {
-    text-align: left;
-    font-weight: 500;
-    overflow-wrap: anywhere;
-}
-.price-card td {
-    text-align: right;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-.price-card tbody tr:nth-child(even) {
-    background: #daf1fb40;
-}
-.price-card tbody tr:last-child > * {
-    border-bottom: 0;
-}
-.price-card a {
-    color: var(--brand-navy);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    font-size: 11px;
-}
-.pricing-contact {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    margin-top: 28px;
-    padding: 24px 28px;
-    border-radius: 14px;
-    background: #dff3fb;
-    color: var(--brand-navy);
-}
-.pricing-contact strong {
-    font-size: 15px;
-}
-.pricing-contact p {
-    margin: 5px 0 0;
-    font-size: 13px;
-}
-.pricing-contact p a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-.pricing-contact .btn {
-    flex-shrink: 0;
-}
-@media (max-width: 720px) {
-    .pricing {
-        padding: 45px 0;
-    }
-    .pricing-grid {
-        grid-template-columns: 1fr;
-    }
-    .price-card th,
-    .price-card td {
-        padding: 11px 9px;
-    }
-    .price-card table {
-        font-size: 12px;
-    }
-    .price-card thead th:first-child {
-        width: 44%;
-    }
-    .pricing-contact {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 22px;
-    }
-    .nav {
-        flex-wrap: wrap;
-        gap: 12px 20px;
-    }
-}
-</style>
-    <link rel="stylesheet" href="assets/checkout.css?v=20261001-order-discounts">
-    <link rel="stylesheet" href="assets/layout.css?v=20261002-weight-prices">
+        <link rel="stylesheet" href="assets/css/colors.css">
+<link rel="stylesheet" href="assets/css/site.css?v=20261003-organized">
+    <link rel="stylesheet" href="assets/css/checkout.css?v=20261001-order-discounts">
+    <link rel="stylesheet" href="assets/css/layout.css?v=20261002-weight-prices">
     </head>
     <body>
         <header class="wrap top">
             <a class="brand" href="#home">
-                <img src="assets/dripclean-logo.png" alt="Dripclean Laundry" width="1774" height="887">
+                <img src="assets/images/dripclean-logo.png" alt="Dripclean Laundry" width="1774" height="887">
             </a>
             <nav class="nav" aria-label="Main navigation">
                 <a href="#home" aria-current="page">Home</a>
@@ -679,9 +51,9 @@ footer {
                 playsinline
                 preload="metadata"
             >
-                <source src="assets/laundry-hero-v2.mp4" type="video/mp4">
+                <source src="assets/videos/laundry-hero-v2.mp4" type="video/mp4">
                 Your browser does not support embedded video.
-                <a href="assets/laundry-hero-v2.mp4">Watch the laundry video</a>.
+                <a href="assets/videos/laundry-hero-v2.mp4">Watch the laundry video</a>.
             </video>
         </section>
         <section class="services" id="services" data-view="services" hidden>
@@ -691,13 +63,13 @@ footer {
             </h2>
             <div class="cards">
                 <article class="card wash-fold-card">
-                    <img class="service-photo" src="assets/wash-fold-clothes.png" alt="Fresh clothes arranged on wooden hangers" width="1013" height="525" loading="lazy">
+                    <img class="service-photo" src="assets/images/wash-fold-clothes.png" alt="Fresh clothes arranged on wooden hangers" width="1013" height="525" loading="lazy">
                     <b>◉ &nbsp; Wash &amp; fold</b>
                     <p>Everyday clothes washed, dried, and folded neatly, ready to put away.</p>
                     <div class="price" data-from-service="fold">From GH₵ 4 <small>/ item</small></div>
                 </article>
                 <article class="card delicate-care-card">
-                    <img class="service-photo" src="assets/delicate-care-photo.png" alt="Carefully inspecting a garment beside a laundry drying rack" width="405" height="607" loading="lazy" style="object-position: center 40%">
+                    <img class="service-photo" src="assets/images/delicate-care-photo.png" alt="Carefully inspecting a garment beside a laundry drying rack" width="405" height="607" loading="lazy" style="object-position: center 40%">
                     <b>♧ &nbsp; Delicate care</b>
                     <p>Extra attention for fabrics and favourites that need a gentler touch.</p>
                     <div class="price">Ask us <small>for a quote</small></div>
@@ -794,17 +166,17 @@ footer {
     </h2>
     <div class="process-grid">
         <article>
-            <img class="process-photo" src="assets/process-collection.jpg" alt="Laundry collected in a basket" width="800" height="1200" loading="lazy">
+            <img class="process-photo" src="assets/images/process-collection.jpg" alt="Laundry collected in a basket" width="800" height="1200" loading="lazy">
             <h3>1. Laundry collection</h3>
             <p>Choose your pickup day. We collect your laundry right at your doorstep.</p>
         </article>
         <article>
-            <img class="process-photo" src="assets/process-cleaning.jpg" alt="Towels being handled in a commercial washing machine" width="800" height="1200" loading="lazy">
+            <img class="process-photo" src="assets/images/process-cleaning.jpg" alt="Towels being handled in a commercial washing machine" width="800" height="1200" loading="lazy">
             <h3>2. Expert cleaning</h3>
             <p>Careful cleaning and attention to every fabric, for a fresh finish.</p>
         </article>
         <article>
-            <img class="process-photo" src="assets/process-ready.jpg" alt="Fresh towels folded neatly on a wicker basket" width="800" height="1200" loading="lazy">
+            <img class="process-photo" src="assets/images/process-ready.jpg" alt="Fresh towels folded neatly on a wicker basket" width="800" height="1200" loading="lazy">
             <h3>3. Fresh and ready</h3>
             <p>Clean, neatly folded, and ready for your wardrobe. Get a text when it is ready.</p>
         </article>
@@ -935,7 +307,7 @@ footer {
             <p>Fresh, folded, ready for whatever’s next.<br>Book your pickup and let us handle the rest.</p>
             <a class="btn" href="#cart">Book a pickup ↗</a>
         </div>
-        <div class="flyervis"><img src="assets/blue-fabric.jpg" alt="Blue fabric fibers with fresh bubbles" width="658" height="1170" loading="lazy">
+        <div class="flyervis"><img src="assets/images/blue-fabric.jpg" alt="Blue fabric fibers with fresh bubbles" width="658" height="1170" loading="lazy">
     </div>
 </div>
 </section>
@@ -949,6 +321,6 @@ footer {
 </footer>
 <div class="toast" id="toast" role="status">
 </div>
-<script src="assets/app.js?v=20261003-doormat-shoe" defer></script>
+<script src="assets/js/app.js?v=20261003-doormat-shoe" defer></script>
 </body>
 </html>
