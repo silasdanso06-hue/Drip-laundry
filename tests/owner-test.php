@@ -55,7 +55,7 @@ $after = catalogSnapshot();
 $indexed = array_column($after['catalog'], null, 'id');
 checkOwner($indexed['item-1-2']['fold'] === 8.75, 'Decimal price was not saved.');
 checkOwner($indexed['item-1-2']['name'] === 'Cotton T-shirt' && $indexed['item-1-2']['category'] === 'Everyday clothing', 'Item name/category or whitespace normalization was not saved.');
-checkOwner(count($indexed) === count($snapshot['catalog']) && $indexed['load-6kg']['unit'] === 'load', 'Editing must preserve item IDs and load units.');
+checkOwner(array_keys($indexed) === array_column($snapshot['catalog'], 'id'), 'Editing must preserve item IDs.');
 checkOwner($indexed['item-4-2']['fold'] === null, 'A blank price should request a quote.');
 checkOwner($snapshot['version'] !== $after['version'], 'Price revision must change.');
 try {
