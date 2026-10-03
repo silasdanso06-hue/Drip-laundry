@@ -1,0 +1,7 @@
+{
+  "tiers": [
+    { "minimumMinor": 10001, "ratePercent": 5 },
+    { "minimumMinor": 20000, "ratePercent": 10 }
+  ],
+  "description": "Save 5% on orders over GH₵100, or 10% on orders of GH₵200 or more. Discount applies automatically to your subtotal."
+}

@@ -1,0 +1,321 @@
+[
+    {
+        "id": "item-1-1",
+        "category": "Men’s wear",
+        "name": "Joggers light weight",
+        "fold": 7
+    },
+    {
+        "id": "item-1-2",
+        "category": "Men’s wear",
+        "name": "T-Shirt",
+        "fold": 4
+    },
+    {
+        "id": "item-1-3",
+        "category": "Men’s wear",
+        "name": "Jeans Trouser",
+        "fold": 10
+    },
+    {
+        "id": "item-1-4",
+        "category": "Men’s wear",
+        "name": "Jeans Short",
+        "fold": 7
+    },
+    {
+        "id": "item-1-5",
+        "category": "Men’s wear",
+        "name": "Material Trouser",
+        "fold": 5
+    },
+    {
+        "id": "item-1-6",
+        "category": "Men’s wear",
+        "name": "Shirt",
+        "fold": 4
+    },
+    {
+        "id": "item-1-7",
+        "category": "Men’s wear",
+        "name": "Singlet",
+        "fold": 3,
+        "iron": 7
+    },
+    {
+        "id": "item-1-8",
+        "category": "Men’s wear",
+        "name": "Suit Full",
+        "fold": 50,
+        "iron": 65
+    },
+    {
+        "id": "item-1-9",
+        "category": "Men’s wear",
+        "name": "Smock",
+        "fold": 30,
+        "iron": 65
+    },
+    {
+        "id": "item-1-10",
+        "category": "Men’s wear",
+        "name": "Jacket",
+        "fold": 15,
+        "iron": 15
+    },
+    {
+        "id": "item-1-11",
+        "category": "Men’s wear",
+        "name": "Hoody heavy",
+        "fold": 12,
+        "iron": 20
+    },
+    {
+        "id": "hoody-normal",
+        "category": "Men’s wear",
+        "name": "Normal hoody",
+        "fold": 6
+    },
+    {
+        "id": "item-1-12",
+        "category": "Men’s wear",
+        "name": "Agbada",
+        "fold": 30,
+        "iron": 45
+    },
+    {
+        "id": "item-1-13",
+        "category": "Men’s wear",
+        "name": "Kaftan",
+        "fold": 25,
+        "iron": 35
+    },
+    {
+        "id": "item-1-14",
+        "category": "Men’s wear",
+        "name": "Normal Shorts",
+        "fold": 5,
+        "iron": 7
+    },
+    {
+        "id": "jersey-shorts",
+        "category": "Men’s wear",
+        "name": "Jersey shorts",
+        "fold": 3
+    },
+    {
+        "id": "item-1-15",
+        "category": "Men’s wear",
+        "name": "Suit Blazer",
+        "fold": 20,
+        "iron": 30
+    },
+    {
+        "id": "item-1-16",
+        "category": "Men’s wear",
+        "name": "Jalabia",
+        "fold": 10,
+        "iron": 15
+    },
+    {
+        "id": "item-1-17",
+        "category": "Men’s wear",
+        "name": "Handkerchief",
+        "fold": 2,
+        "iron": 5
+    },
+    {
+        "id": "item-1-18",
+        "category": "Men’s wear",
+        "name": "Boxer",
+        "fold": 5,
+        "iron": 5
+    },
+    {
+        "id": "item-3-1",
+        "category": "Ladies",
+        "name": "T-Shirt",
+        "fold": 4,
+        "iron": 10
+    },
+    {
+        "id": "item-3-2",
+        "category": "Ladies",
+        "name": "Blouse",
+        "fold": 4,
+        "iron": 7
+    },
+    {
+        "id": "item-3-3",
+        "category": "Ladies",
+        "name": "Material Skirt",
+        "fold": 5,
+        "iron": 10
+    },
+    {
+        "id": "item-3-4",
+        "category": "Ladies",
+        "name": "Straight Dress",
+        "fold": 7,
+        "iron": 12
+    },
+    {
+        "id": "item-4-1",
+        "category": "Other wear",
+        "name": "Suit",
+        "fold": 30,
+        "iron": 65
+    },
+    {
+        "id": "item-4-2",
+        "category": "Other wear",
+        "name": "Kaba & Slit",
+        "fold": 30,
+        "iron": 45
+    },
+    {
+        "id": "item-4-3",
+        "category": "Other wear",
+        "name": "Skirt Jeans",
+        "fold": 10,
+        "iron": 15
+    },
+    {
+        "id": "item-4-4",
+        "category": "Other wear",
+        "name": "Short Jeans",
+        "fold": 7,
+        "iron": 15
+    },
+    {
+        "id": "item-4-5",
+        "category": "Other wear",
+        "name": "Joggers heavy",
+        "fold": 12,
+        "iron": 15
+    },
+    {
+        "id": "item-5-1",
+        "category": "Bed & linen",
+        "name": "Bedsheet complete",
+        "fold": 25,
+        "iron": 30
+    },
+    {
+        "id": "bedsheet-heavy",
+        "category": "Bed & linen",
+        "name": "Bedsheet heavy",
+        "fold": 20
+    },
+    {
+        "id": "item-5-2",
+        "category": "Bed & linen",
+        "name": "Towel",
+        "fold": 10,
+        "iron": 15
+    },
+    {
+        "id": "item-5-3",
+        "category": "Bed & linen",
+        "name": "Duvet heavy",
+        "fold": 40,
+        "iron": 45
+    },
+    {
+        "id": "duvet-normal",
+        "category": "Bed & linen",
+        "name": "Duvet normal",
+        "fold": 25
+    },
+    {
+        "id": "item-5-4",
+        "category": "Bed & linen",
+        "name": "Pillow Cases",
+        "fold": 3,
+        "iron": 10
+    },
+    {
+        "id": "item-5-5",
+        "category": "Bed & linen",
+        "name": "Blanket Heavy",
+        "fold": 20,
+        "iron": 35
+    },
+    {
+        "id": "item-5-6",
+        "category": "Bed & linen",
+        "name": "Blanket Normal",
+        "fold": 15,
+        "iron": 30
+    },
+    {
+        "id": "item-5-7",
+        "category": "Bed & linen",
+        "name": "Curtain heavy",
+        "fold": 25,
+        "iron": 35
+    },
+    {
+        "id": "curtain-normal",
+        "category": "Bed & linen",
+        "name": "Curtain normal",
+        "fold": 15
+    },
+    {
+        "id": "item-5-8",
+        "category": "Bed & linen",
+        "name": "Napkin",
+        "fold": 5,
+        "iron": 5
+    },
+    {
+        "id": "item-5-9",
+        "category": "Bed & linen",
+        "name": "Blanket Small",
+        "fold": 15,
+        "iron": 20
+    },
+    {
+        "id": "item-5-10",
+        "category": "Bed & linen",
+        "name": "Bedsheet light weight",
+        "fold": 15,
+        "iron": 15
+    },
+    {
+        "id": "load-6kg",
+        "category": "Laundry by weight",
+        "name": "6 kg load",
+        "fold": 50,
+        "iron": null,
+        "unit": "load"
+    },
+    {
+        "id": "load-7kg",
+        "category": "Laundry by weight",
+        "name": "7 kg load",
+        "fold": 60,
+        "iron": null,
+        "unit": "load"
+    },
+    {
+        "id": "load-8kg",
+        "category": "Laundry by weight",
+        "name": "8 kg load",
+        "fold": 70,
+        "iron": null,
+        "unit": "load"
+    },
+    {
+        "id": "item-2-1",
+        "category": "Doormats & shoes",
+        "name": "Doormat",
+        "fold": 20
+    },
+    {
+        "id": "item-2-2",
+        "category": "Doormats & shoes",
+        "name": "Shoe",
+        "fold": 20
+    }
+]

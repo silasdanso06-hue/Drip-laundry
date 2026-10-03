@@ -1,0 +1,5 @@
+﻿Tool: built-in image_gen (imagegen skill)
+Source: photo_2026-09-29_19-02-22.jpg
+Output: assets/dripclean-logo.png
+
+Use case: background-extraction. Edit target: the supplied Dripclean Laundry logo. Remove only the white background, including white negative spaces within the symbol and lettering, to actual alpha transparency. Preserve exactly the existing blue and cyan shirt-and-water symbol, the precise shapes, arrangement, and typography, and the words DRIPCLEAN and LAUNDRY. Do not redesign, redraw, add, or change any lettering, colors or proportions. Crop away excess blank canvas, leaving a small even transparent margin around the whole horizontal logo. Output a crisp PNG logo with a genuinely transparent background, not a white or checkerboard background.

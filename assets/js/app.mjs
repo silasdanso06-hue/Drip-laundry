@@ -1,0 +1,765 @@
+import { SERVICES, addItem, priceCart, cartSummary } from './cart.mjs';
+
+const $ = selector => document.querySelector(selector);
+const money = value => `GH₵ ${value.toFixed(2)}`;
+let orderKey = 'driverCleanOrders';
+let customer = null;
+let customerCsrf = '';
+let accountMode = 'login';
+let accountModeChosen = false;
+let serverOrders = {};
+let onlinePayments = { enabled: false, mode: 'test' };
+function showAccountError(error) {
+    $('#accountStatus').textContent = error.message;
+    $('#accountStatus').scrollIntoView({ block: 'nearest' });
+    if (location.protocol === 'file:' || /XAMPP|account server/i.test(error.message)) {
+        $('#accountServerHelp').hidden = false;
+    }
+}
+
+async function syncOrders(order) {
+    const response = await fetch('orders.php', order ? {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csrf: customerCsrf, order })
+    } : { cache: 'no-store' });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not load your orders.');
+    serverOrders = data.orders;
+    renderOrders();
+}
+
+async function accountRequest(action, fields = {}) {
+    if (location.protocol === 'file:') throw new Error('Open http://localhost/Driplaudary/ with XAMPP running to use customer accounts.');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let response;
+    let data;
+    try {
+    response = await fetch('customer.php', action ? {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({ ...fields, action, csrf: customerCsrf })
+    } : { cache: 'no-store', signal: controller.signal });
+    data = await response.json().catch(() => { throw new Error('Open http://localhost/Driplaudary/#dashboard with XAMPP running to use customer accounts.'); });
+    } catch (error) {
+        if (error.name === 'AbortError') throw new Error('The account server took too long to respond. Please try again.');
+        if (error instanceof TypeError) throw new Error('Cannot reach the account server. Open http://localhost/Driplaudary/#dashboard with XAMPP running.');
+        throw error;
+    } finally {
+        clearTimeout(timeout);
+    }
+    if (typeof data?.csrf !== 'string' && response.ok) throw new Error('Open http://localhost/Driplaudary/#dashboard with XAMPP running to use customer accounts.');
+    if (!response.ok) throw new Error(data.error || 'Could not load your account. Please try again.');
+    const changedAccount = customer?.id !== data.user?.id;
+    customer = data.user;
+    if (!customer && data.needsFirstAccount && !accountModeChosen && !$('#accountEmail').value && !$('#accountPassword').value) setAccountMode('signup', false);
+    customerCsrf = data.csrf;
+    $('#accountCsrf').value = customerCsrf;
+    orderKey = customer ? `dripcleanOrders:${customer.id}` : 'driverCleanOrders';
+    $('#accountPanel').hidden = !!customer;
+    $('#dashboardContent').hidden = !customer;
+    $('#accountWelcome').textContent = customer
+        ? `${action === 'signup' ? 'Welcome to Dripclean' : 'Welcome back'}, ${customer.name}!`
+        : '';
+    if (changedAccount) {
+        serverOrders = {};
+        $('#result').replaceChildren();
+        $('#result').style.display = 'none';
+        $('#checkoutResult').replaceChildren();
+        $('#checkoutResult').hidden = true;
+        $('#trackId').value = '';
+    }
+    renderOrders();
+    $('#accountStatus').textContent = '';
+    if (customer) {
+        try { await syncOrders(); }
+        catch (error) { $('#accountStatus').textContent = 'You are signed in, but your orders could not be loaded. Please refresh to try again.'; }
+    }
+    return customer;
+}
+
+function setAccountMode(mode, chosen = true) {
+    if (chosen) accountModeChosen = true;
+    accountMode = mode;
+    $('#accountAction').value = mode;
+    const signup = mode === 'signup';
+    $('#signupName').hidden = !signup;
+    $('#accountEmail').type = 'text';
+    $('#accountEmailLabel').textContent = 'Phone number or email address';
+    $('#accountIdentifierHelp').textContent = signup
+        ? 'Create an account with your phone number or email address.'
+        : 'Sign in with the phone number or email address saved on your account and your password.';
+    $('#signupConfirm').hidden = !signup;
+    $('#accountName').required = signup;
+    $('#accountConfirm').required = signup;
+    $('#accountPassword').autocomplete = signup ? 'new-password' : 'current-password';
+    $('#accountPassword').maxLength = 72;
+    $('#passwordHint').textContent = signup ? 'Choose your own password.' : 'Enter your account password.';
+    $('#accountTitle').textContent = signup ? 'Create your account' : 'Welcome back';
+    $('#accountSubmit').textContent = signup ? 'Create account' : 'Log in';
+    $('#loginTab').setAttribute('aria-pressed', String(!signup));
+    $('#signupTab').setAttribute('aria-pressed', String(signup));
+    $('#accountSwitchPrompt').textContent = signup ? 'Already have an account?' : 'New to Dripclean Laundry?';
+    $('#accountSwitch').textContent = signup ? 'Log in' : 'Create an account';
+}
+
+$('#loginTab').onclick = () => setAccountMode('login');
+$('#signupTab').onclick = () => setAccountMode('signup');
+$('#accountSwitch').onclick = () => {
+    setAccountMode(accountMode === 'login' ? 'signup' : 'login');
+    $(accountMode === 'signup' ? '#accountName' : '#accountEmail').focus();
+};
+$('#accountForm').onsubmit = async event => {
+    event.preventDefault();
+    $('#accountSubmit').disabled = true;
+    $('#loginTab').disabled = true;
+    $('#signupTab').disabled = true;
+    $('#accountSwitch').disabled = true;
+    $('#accountStatus').textContent = 'Please wait…';
+    try {
+        if (accountMode === 'signup') {
+            if ($('#accountPassword').value !== $('#accountConfirm').value) throw new Error('The passwords must match.');
+        }
+        // Start a fresh session if the initial page request failed or expired.
+        await accountRequest();
+        $('#accountAction').value = accountMode;
+        HTMLFormElement.prototype.submit.call(event.target);
+    } catch (error) {
+        showAccountError(error);
+    } finally {
+        $('#accountSubmit').disabled = false;
+        $('#loginTab').disabled = false;
+        $('#signupTab').disabled = false;
+        $('#accountSwitch').disabled = false;
+    }
+};
+$('#customerLogout').onclick = async () => {
+    $('#customerLogout').disabled = true;
+    try {
+        await accountRequest('logout');
+        $('#booking').reset();
+        $('#accountStatus').textContent = 'You have logged out.';
+    } catch (error) {
+        $('#accountStatus').textContent = error.message;
+    } finally {
+        $('#customerLogout').disabled = false;
+    }
+};
+const cartKey = 'dripcleanCart';
+const routes = new Set(['home', 'services', 'pricing', 'process', 'dashboard', 'cart']);
+const paymentMethods = new Set(['Cash on pickup', 'Mobile Money', 'Online payment', 'Paystack']);
+let catalog = [];
+let discountPolicy = typeof EMBEDDED_DISCOUNT_POLICY !== 'undefined' ? EMBEDDED_DISCOUNT_POLICY : { tiers: [], description: '' };
+let cart = [];
+let toastTimer;
+let saving = false;
+let catalogLoaded = false;
+let catalogRequest = null;
+
+function bindAddButton(button) {
+    button.onclick = () => {
+        try {
+            if (!catalogLoaded) throw new Error('Please wait for current prices to load.');
+            updateCart(addItem(cart, button.dataset.item, button.dataset.service, catalog));
+            const item = catalog.find(product => product.id === button.dataset.item);
+            $('#pricingNotice').textContent = `${item.name} added. View your cart to change quantities or check out.`;
+            toast(`${item.name} added to your cart.`);
+        } catch (error) {
+            toast(error.message);
+        }
+    };
+}
+
+function priceGroups(items) {
+    const groups = new Map();
+    for (const item of items) {
+        if (!groups.has(item.category)) groups.set(item.category, []);
+        groups.get(item.category).push(item);
+    }
+    return [...groups.entries()];
+}
+
+function priceCard(category, items, byLoad = false) {
+    const card = element('article', undefined, byLoad ? 'price-card weight-prices' : 'price-card');
+    const table = element('table');
+    const services = ['fold'];
+    table.append(element('caption', byLoad ? `${category} · Wash & fold` : category));
+    const header = element('thead');
+    const headings = element('tr');
+    for (const label of [byLoad ? 'Load' : 'Item', byLoad ? 'Price per load' : 'Wash & fold']) {
+        const heading = element('th', label);
+        heading.setAttribute('scope', 'col');
+        headings.append(heading);
+    }
+    header.append(headings);
+    table.append(header);
+    const body = element('tbody');
+    for (const item of items) {
+        const row = element('tr');
+        row.setAttribute('data-price-item', item.id);
+        const name = element('th', item.name);
+        name.setAttribute('scope', 'row');
+        row.append(name);
+        for (const service of services) {
+            const cell = element('td');
+            if (item[service] === null) {
+                const link = element('a', 'Contact us');
+                link.href = 'tel:0508103264';
+                cell.append(link);
+            } else {
+                const button = element('button', money(item[service]), 'add-price');
+                button.type = 'button';
+                button.dataset.item = item.id;
+                button.dataset.service = service;
+                button.setAttribute('aria-label', `Add ${item.name}, ${item.category}, wash and ${service}, ${money(item[service])}`);
+                button.append(element('span', '+ Add'));
+                bindAddButton(button);
+                cell.append(button);
+            }
+            row.append(cell);
+        }
+        body.append(row);
+    }
+    table.append(body);
+    card.append(table);
+    return card;
+}
+
+function renderPrices() {
+    const loadHost = $('#weightPriceGroups');
+    const itemHost = $('#itemPriceGroups');
+    loadHost.replaceChildren();
+    itemHost.replaceChildren();
+    priceGroups(catalog.filter(item => item.unit === 'load')).forEach(([category, items], index) => {
+        const card = priceCard(category, items, true);
+        if (index === 0) card.setAttribute('id', 'weightPrices');
+        loadHost.append(card);
+    });
+    const groups = priceGroups(catalog.filter(item => item.unit !== 'load'));
+    const totalRows = groups.reduce((sum, [, items]) => sum + items.length + 3, 0);
+    let split = groups.length, prefix = 0, best = Infinity;
+    for (let index = 0; index < groups.length - 1; index++) {
+        prefix += groups[index][1].length + 3;
+        if (Math.abs(totalRows - prefix * 2) < best) { best = Math.abs(totalRows - prefix * 2); split = index + 1; }
+    }
+    for (const part of [groups.slice(0, split), groups.slice(split)]) {
+        if (!part.length) continue;
+        const column = element('div', undefined, 'pricing-column');
+        part.forEach(([category, items]) => column.append(priceCard(category, items)));
+        itemHost.append(column);
+    }
+    document.querySelectorAll('[data-from-service]').forEach(summary => {
+        const values = catalog.map(item => item[summary.dataset.fromService]).filter(Number.isFinite);
+        summary.replaceChildren();
+        summary.textContent = values.length ? `From ${money(Math.min(...values))} ` : 'Contact us';
+        if (values.length) summary.append(element('small', '/ item'));
+    });
+}
+
+async function refreshCatalog() {
+    if (catalogRequest) return catalogRequest;
+    catalogRequest = (async () => {
+        let next;
+        let nextDiscounts = discountPolicy;
+        if (window.location.protocol === 'file:' && typeof EMBEDDED_CATALOG !== 'undefined') {
+            next = EMBEDDED_CATALOG;
+        } else {
+            const response = await fetch('catalog.php', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Current prices could not be loaded. Please try again.');
+            const snapshot = await response.json();
+            if (!Array.isArray(snapshot.catalog)) throw new Error('Open the live site through XAMPP to load current prices.');
+            next = snapshot.catalog;
+            if (snapshot.discountPolicy) nextDiscounts = snapshot.discountPolicy;
+        }
+        const changed = catalogLoaded && (JSON.stringify(catalog) !== JSON.stringify(next) || JSON.stringify(discountPolicy) !== JSON.stringify(nextDiscounts));
+        catalog = next;
+        discountPolicy = nextDiscounts;
+        catalogLoaded = true;
+        const available = availableCart(cart);
+        if (available.length !== cart.length) {
+            cart = available;
+            persistCart();
+            toast('An unavailable item or service was removed from your cart. Please review the remaining items.');
+        }
+        renderPrices();
+        renderCart();
+        if (changed) $('#pricingNotice').textContent = 'Prices have been updated. Your cart now uses the current prices.';
+        return changed;
+    })();
+    try {
+        return await catalogRequest;
+    } finally {
+        catalogRequest = null;
+    }
+}
+
+function paymentMethod(order) {
+    return paymentMethods.has(order.paymentMethod) ? order.paymentMethod : 'Cash on pickup';
+}
+
+function paymentSummary(order) {
+    const status = order.paymentStatus || 'Unpaid';
+    if (order.paymentReview) return 'Payment needs review. Please contact us before paying again.';
+    if (status === 'Paid') return 'Paid in full · Amount paid: ' + money(order.total);
+    if (status === 'Refunded') return 'Payment refunded';
+    return 'Awaiting payment · Amount due: ' + money(order.total);
+}
+
+function paymentInstructions(method) {
+    if (method === 'Online payment') return onlinePayments.mode === 'test'
+        ? 'Test checkout only. Your order will be saved, but no real payment will be recorded.'
+        : 'Save your order, then continue to Paystack. Choose Mobile Money for MTN MoMo or Telecel Cash, or pay by card.';
+    return method === 'Mobile Money'
+        ? 'Call 0508103264 or 0556333654 for the Mobile Money transfer details. Your order stays unpaid until we verify payment.'
+        : 'Pay in cash when your laundry is collected.';
+}
+
+document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+    input.addEventListener('change', () => {
+        $('#paymentInstructions').textContent = paymentInstructions(input.value);
+        $('#saveOrderButton').textContent = input.value === 'Online payment' ? 'Save order & continue to payment' : 'Save order & create invoice';
+    });
+});
+
+function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+}
+
+function toast(message) {
+    clearTimeout(toastTimer);
+    $('#toast').textContent = message;
+    $('#toast').classList.add('show');
+    toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 4500);
+}
+
+function readStorage(key, fallback) {
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+}
+
+function availableCart(lines) {
+    if (!Array.isArray(lines)) throw new Error('The saved cart is invalid.');
+    return lines.filter(line => {
+        const item = line && catalog.find(product => product.id === line.id);
+        return item && Object.hasOwn(SERVICES, line.service) && Number.isFinite(item[line.service]) && item[line.service] >= 0;
+    });
+}
+
+function persistCart() {
+    try {
+        if (cart.length) localStorage.setItem(cartKey, JSON.stringify(cart));
+        else localStorage.removeItem(cartKey);
+    } catch (_) {
+        // Storage can be blocked or full. Keep checkout working in this tab.
+    }
+}
+
+function orders() {
+    if (customer) return serverOrders;
+    const saved = readStorage(orderKey, {});
+    if (!saved || Array.isArray(saved) || typeof saved !== 'object') {
+        throw new Error('Saved orders could not be read. Please contact us for help.');
+    }
+    return saved;
+}
+
+function showView(name, focus = false) {
+    const route = routes.has(name) ? name : 'home';
+    document.querySelectorAll('[data-view]').forEach(view => {
+        view.hidden = view.dataset.view !== route;
+    });
+    document.querySelectorAll('.nav a').forEach(link => {
+        if (link.hash === `#${route}`) {
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.removeAttribute('aria-current');
+        }
+    });
+    const video = $('#heroVideo');
+    if (video) {
+        if (route === 'home' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            video.play()?.catch(() => {});
+        } else {
+            video.pause();
+        }
+    }
+    if (route === 'dashboard') {
+        renderOrders();
+        if (customer) syncOrders().catch(() => { $('#accountStatus').textContent = 'Could not refresh your orders. Please try again.'; });
+    }
+    const heading = document.querySelector(`[data-view="${route}"] h1, [data-view="${route}"] h2`);
+    if (focus && heading) {
+        heading.setAttribute('tabindex', '-1');
+        heading.focus({ preventScroll: true });
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (catalogLoaded && (route === 'pricing' || route === 'cart')) {
+        refreshCatalog().catch(error => toast(error.message));
+    }
+}
+
+document.addEventListener('click', event => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const route = link.hash.slice(1) || 'home';
+    if (!routes.has(route)) return;
+    event.preventDefault();
+    if (window.location.hash !== `#${route}`) {
+        try {
+            history.pushState(null, '', `#${route}`);
+        } catch {
+            // Some local-file previews restrict the History API.
+            window.location.hash = route;
+        }
+    }
+    showView(route, true);
+});
+
+window.addEventListener('popstate', () => showView(window.location.hash.slice(1)));
+window.addEventListener('hashchange', () => showView(window.location.hash.slice(1)));
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', event => {
+    if (event.matches) $('#heroVideo').pause();
+});
+
+function updateCart(next) {
+    priceCart(next, catalog);
+    cart = next;
+    persistCart();
+    renderCart();
+}
+
+function changeQuantity(index, quantity) {
+    try {
+        const next = cart.map(line => ({ ...line }));
+        next[index].quantity = quantity;
+        updateCart(next);
+    } catch (error) {
+        toast(error.message);
+        renderCart();
+    }
+}
+
+function renderCart() {
+    const lines = priceCart(cart, catalog);
+    const summary = cartSummary(lines, discountPolicy);
+    const count = lines.reduce((sum, line) => sum + line.quantity, 0);
+    $('#cartCount').textContent = count;
+    $('#pricingCartCount').textContent = `(${count})`;
+    $('#cartSubtotal').textContent = money(summary.subtotal);
+    $('#cartDiscountRow').hidden = summary.discountAmount === 0;
+    $('#cartDiscountLabel').textContent = `Discount (${summary.discountRate}%)`;
+    $('#cartDiscount').textContent = '−' + money(summary.discountAmount);
+    $('#cartTotal').textContent = money(summary.total);
+    $('#discountOffer').textContent = discountPolicy.description;
+    $('#saveOrderButton').disabled = lines.length === 0 || saving;
+    $('#cartItems').replaceChildren();
+
+    if (lines.length === 0) {
+        const empty = element('div', undefined, 'empty-cart');
+        empty.append(
+            element('h3', 'Your laundry cart is empty'),
+            element('p', 'Choose your clothes and a wash service from the price list.')
+        );
+        const link = element('a', 'Choose clothes →', 'btn');
+        link.href = '#pricing';
+        empty.append(link);
+        $('#cartItems').append(empty);
+        return;
+    }
+
+    lines.forEach((line, index) => {
+        const card = element('article', undefined, 'cart-line');
+        const heading = element('div', undefined, 'cart-line-heading');
+        heading.append(element('h3', line.name), element('strong', money(line.total)));
+        card.append(heading, element('p', `${line.category} · ${line.serviceName} · ${money(line.unitPrice)} per ${line.unit}`));
+        const controls = element('div', undefined, 'cart-line-controls');
+        const quantity = element('div', undefined, 'quantity-control');
+        const minus = element('button', '−');
+        minus.type = 'button';
+        minus.setAttribute('aria-label', `Decrease ${line.name} quantity`);
+        minus.disabled = line.quantity === 1;
+        minus.onclick = () => changeQuantity(index, line.quantity - 1);
+        const input = element('input');
+        input.type = 'number';
+        input.min = '1';
+        input.max = '99';
+        input.step = '1';
+        input.value = line.quantity;
+        input.setAttribute('aria-label', `Quantity for ${line.name}, ${line.serviceName}`);
+        input.onchange = () => changeQuantity(index, Number(input.value));
+        const plus = element('button', '+');
+        plus.type = 'button';
+        plus.disabled = line.quantity === 99;
+        plus.setAttribute('aria-label', `Increase ${line.name} quantity`);
+        plus.onclick = () => changeQuantity(index, line.quantity + 1);
+        quantity.append(minus, input, plus);
+        const remove = element('button', 'Remove', 'remove-item');
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `Remove ${line.name}, ${line.serviceName}`);
+        remove.onclick = () => {
+            try {
+                updateCart(cart.filter((_, lineIndex) => lineIndex !== index));
+            } catch (error) {
+                toast(error.message);
+            }
+        };
+        controls.append(quantity, remove);
+        card.append(controls);
+        $('#cartItems').append(card);
+    });
+}
+
+async function downloadInvoice(id, order, button) {
+    button.disabled = true;
+    const originalLabel = button.textContent;
+    button.textContent = 'Preparing PDF…';
+    try {
+        if (window.location.protocol === 'file:') {
+            throw new Error('To download PDF invoices, open the site at http://localhost/Driplaudary/ with XAMPP running.');
+        }
+        const response = await fetch('invoice.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...order, id })
+        });
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Invoice could not be downloaded. Please try again.');
+        }
+        if (!response.headers.get('Content-Type')?.includes('application/pdf')) {
+            throw new Error('PDF invoices need the site to run through your web server.');
+        }
+        const url = URL.createObjectURL(await response.blob());
+        const link = element('a');
+        link.href = url;
+        link.download = `${id}-invoice.pdf`;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        toast('Your invoice PDF is ready with the saved order details and current payment status.');
+    } catch (error) {
+        toast(error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = originalLabel;
+    }
+}
+
+function invoiceButton(id, order) {
+    const button = element('button', 'Download invoice PDF', 'btn');
+    button.type = 'button';
+    button.onclick = () => downloadInvoice(id, order, button);
+    return button;
+}
+
+function onlinePaymentButton(id, order) {
+    const canPay = onlinePayments.enabled && (order.paymentStatus || 'Unpaid') === 'Unpaid' && order.status !== 'Cancelled' && !order.paymentReview;
+    if (!canPay && !order.paymentReference && order.paymentMethod !== 'Online payment') return null;
+    const label = canPay ? (onlinePayments.mode === 'test' ? 'Test online payment' : 'Pay online') : 'Payment details';
+    const link = element('a', label, 'btn');
+    link.href = 'payment.php?order=' + encodeURIComponent(id);
+    return link;
+}
+
+function appendDiscount(container, order) {
+    if (order.discountAmount > 0) container.append(element('p', `Subtotal ${money(order.subtotal)} · ${order.discountRate}% discount: −${money(order.discountAmount)}`, 'discount-savings'));
+}
+
+function showOrder(id, order) {
+    const result = $('#result');
+    result.replaceChildren();
+    result.style.display = 'block';
+    result.append(element('strong', id), element('span', order.status || 'Received', 'pill'));
+    result.append(element('p', `${order.name || ''} · Pickup ${order.date || 'to be confirmed'}`));
+    if (order.items?.length) {
+        appendDiscount(result, order);
+        result.append(element('p', `${money(order.total)} · ${paymentMethod(order)} · ${paymentSummary(order)}`));
+        result.append(invoiceButton(id, order));
+        const pay = onlinePaymentButton(id, order);
+        if (pay) result.append(pay);
+    } else {
+        result.append(element('p', order.service || 'Laundry service'));
+    }
+    const steps = element('div', undefined, 'steps');
+    const states = ['Received', 'Being cleaned', 'Ready', 'Delivered'];
+    const current = states.indexOf(order.status);
+    states.forEach((state, index) => steps.append(element('span', `${index <= current ? '✓ ' : ''}${state}`)));
+    result.append(steps);
+}
+
+function renderOrders() {
+    const container = $('#savedOrders');
+    container.replaceChildren();
+    if (!customer) return;
+    try {
+        const entries = Object.entries(orders()).reverse();
+        if (!entries.length) {
+            container.append(element('p', 'No orders saved yet. Choose your clothes from the price list to get started.'));
+        }
+        entries.forEach(([id, order]) => {
+            const card = element('article', undefined, 'saved-order');
+            const heading = element('div', undefined, 'saved-order-heading');
+            heading.append(element('strong', id), element('span', order.status || 'Received', 'pill'));
+            card.append(heading, element('p', `${order.name || ''} · Pickup ${order.date || 'to be confirmed'}`));
+            const actions = element('div', undefined, 'order-actions');
+            const track = element('button', 'View order', 'btn');
+            track.type = 'button';
+            track.onclick = () => {
+                $('#trackId').value = id;
+                showOrder(id, order);
+                $('#result').scrollIntoView({ block: 'center' });
+            };
+            actions.append(track);
+            if (order.items?.length) {
+                appendDiscount(card, order);
+                card.append(element('p', `${money(order.total)} · ${paymentMethod(order)} · ${paymentSummary(order)}`));
+                actions.append(invoiceButton(id, order));
+                const pay = onlinePaymentButton(id, order);
+                if (pay) actions.append(pay);
+            }
+            card.append(actions);
+            container.append(card);
+        });
+    } catch (error) {
+        container.append(element('p', 'Saved orders could not be read. Please contact us for help.'));
+    }
+}
+
+$('#trackForm').onsubmit = event => {
+    event.preventDefault();
+    try {
+        const id = $('#trackId').value.trim().toUpperCase();
+        const order = orders()[id];
+        if (!order) {
+            $('#result').replaceChildren();
+            $('#result').style.display = 'none';
+            toast('Order not found in your account. Check the number or call us.');
+            return;
+        }
+        showOrder(id, order);
+    } catch (error) {
+        toast(error.message);
+    }
+};
+
+$('#booking').onsubmit = async event => {
+    event.preventDefault();
+    if (saving) return;
+    saving = true;
+    $('#saveOrderButton').disabled = true;
+    try {
+        const previousCustomer = customer?.id;
+        if (location.protocol !== 'file:') await accountRequest();
+        if (previousCustomer && previousCustomer !== customer?.id) throw new Error('Your session expired. Log in from the dashboard before saving your order.');
+        if (!customer) {
+            showView('dashboard', true);
+            throw new Error('Please log in or create an account before saving your order. Your cart is kept.');
+        }
+        if (await refreshCatalog()) {
+            throw new Error('Prices have changed. Review your updated cart, then save your order again.');
+        }
+        const lines = priceCart(cart, catalog);
+        if (!lines.length) throw new Error('Add clothes to your cart before creating an order.');
+        if ($('#date').value < $('#date').min) throw new Error('Choose today or a future pickup date.');
+        const selectedPayment = $('input[name="paymentMethod"]:checked')?.value;
+        if (!paymentMethods.has(selectedPayment)) throw new Error('Choose a payment method.');
+        const saved = orders();
+        const id = `DC-${Date.now().toString(36).toUpperCase()}-${crypto.getRandomValues(new Uint16Array(1))[0].toString(36).toUpperCase()}`;
+        const order = {
+            name: $('#name').value.trim(),
+            phone: $('#phone').value.trim(),
+            location: $('#location').value.trim(),
+            date: $('#date').value,
+            service: 'Itemised laundry order',
+            items: cart.map(line => ({ ...line })),
+            ...cartSummary(lines, discountPolicy),
+            paymentMethod: selectedPayment,
+            paymentStatus: 'Unpaid',
+            status: 'Received',
+            createdAt: new Date().toISOString()
+        };
+        if (!order.name || !order.phone || !order.location) throw new Error('Complete your customer and pickup details.');
+        await syncOrders({ ...order, id });
+        cart = [];
+        persistCart();
+        const result = $('#checkoutResult');
+        result.replaceChildren();
+        result.hidden = false;
+        result.append(element('strong', `Order saved: ${id}`));
+        appendDiscount(result, serverOrders[id]);
+        result.append(element('p', `${money(order.total)} due · ${order.paymentMethod} · Unpaid. Call us to confirm collection.`));
+        result.append(element('p', paymentInstructions(order.paymentMethod)));
+        result.append(invoiceButton(id, order));
+        const pay = onlinePaymentButton(id, order);
+        if (pay) result.append(pay);
+        const link = element('a', 'View your orders', 'text-link');
+        link.href = '#dashboard';
+        const actions = element('div', undefined, 'order-actions');
+        actions.append(link);
+        result.append(actions);
+        toast('Your order is saved. Download your invoice below.');
+        if (selectedPayment === 'Online payment') location.assign('payment.php?order=' + encodeURIComponent(id));
+    } catch (error) {
+        toast(error.message);
+    } finally {
+        saving = false;
+        renderCart();
+    }
+};
+
+const today = new Date();
+today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+$('#date').min = today.toISOString().slice(0, 10);
+
+showView(window.location.hash.slice(1));
+
+try {
+    if (location.protocol !== 'file:') {
+        const response = await fetch('payment-config.php', { cache: 'no-store' });
+        if (response.ok) onlinePayments = await response.json();
+    }
+} catch (_) { /* Cash and arranged Mobile Money remain available. */ }
+$('#onlinePaymentChoice').hidden = !onlinePayments.enabled;
+if (onlinePayments.mode === 'test') {
+    $('#onlinePaymentLabel').textContent = 'Online payment (test)';
+    $('#onlinePaymentHelp').textContent = 'Try Paystack checkout. No real payment is recorded.';
+}
+
+try {
+    await accountRequest();
+} catch (error) {
+    showAccountError(error);
+} finally {
+    $('#accountSubmit').disabled = false;
+}
+
+try {
+    await refreshCatalog();
+    try {
+        const restored = readStorage(cartKey, []);
+        cart = availableCart(restored);
+        priceCart(cart, catalog);
+        if (cart.length !== restored.length) {
+            persistCart();
+            toast('An unavailable item or service was removed from your saved cart. Please review your order.');
+        }
+    } catch (error) {
+        cart = [];
+        toast('Your previous cart could not be restored. Please select your clothes again.');
+    }
+    renderCart();
+    document.querySelectorAll('.add-price').forEach(bindAddButton);
+} catch (error) {
+    $('#pricingNotice').textContent = error.message;
+    $('#saveOrderButton').disabled = true;
+    document.querySelectorAll('.add-price').forEach(button => { button.disabled = true; });
+    toast(error.message);
+}
+
+window.addEventListener('focus', () => {
+    if (catalogLoaded) refreshCatalog().catch(error => toast(error.message));
+});

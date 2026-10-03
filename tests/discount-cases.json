@@ -1,0 +1,12 @@
+[
+  { "subtotalMinor": 0, "rate": 0, "discountMinor": 0, "totalMinor": 0 },
+  { "subtotalMinor": 9999, "rate": 0, "discountMinor": 0, "totalMinor": 9999 },
+  { "subtotalMinor": 10000, "rate": 0, "discountMinor": 0, "totalMinor": 10000 },
+  { "subtotalMinor": 10001, "rate": 5, "discountMinor": 500, "totalMinor": 9501 },
+  { "subtotalMinor": 10010, "rate": 5, "discountMinor": 501, "totalMinor": 9509 },
+  { "subtotalMinor": 15000, "rate": 5, "discountMinor": 750, "totalMinor": 14250 },
+  { "subtotalMinor": 19999, "rate": 5, "discountMinor": 1000, "totalMinor": 18999 },
+  { "subtotalMinor": 20000, "rate": 10, "discountMinor": 2000, "totalMinor": 18000 },
+  { "subtotalMinor": 20001, "rate": 10, "discountMinor": 2000, "totalMinor": 18001 },
+  { "subtotalMinor": 33335, "rate": 10, "discountMinor": 3334, "totalMinor": 30001 }
+]
