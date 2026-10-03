@@ -13,6 +13,10 @@ function check(bool $condition, string $message): void
 
 $root = dirname(__DIR__);
 $catalog = json_decode(file_get_contents($root . '/assets/data/catalog.json'), true, 32, JSON_THROW_ON_ERROR);
+// Historical load orders remain supported independently of today's catalogue.
+foreach ([6 => 50, 7 => 60, 8 => 70] as $kg => $price) {
+    $catalog[] = ['id' => 'load-' . $kg . 'kg', 'name' => $kg . ' kg load', 'category' => 'Laundry by weight', 'unit' => 'load', 'fold' => $price];
+}
 // Fix prices in this test fixture; owner edits must not change test expectations.
 foreach ($catalog as &$item) {
     if ($item['fold'] === null) $item['fold'] = 5;
