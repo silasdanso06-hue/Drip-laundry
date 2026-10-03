@@ -35,7 +35,7 @@ function ownerSession(): void
     session_save_path(ownerDirectory() . '/sessions');
     session_set_cookie_params([
         'lifetime' => 0,
-        'path' => str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])) . '/',
+        'path' => rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/',
         'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
         'httponly' => true,
         'samesite' => 'Strict'
