@@ -18,9 +18,11 @@ set_error_handler(static function ($severity, $message, $file, $line): never {
 try {
     require $root . '/lib/owner.php';
     ownerWrite('owner', ['hash' => password_hash('Test123', PASSWORD_DEFAULT), 'version' => 'fixture']);
-    $_SERVER['SCRIPT_NAME'] = '/Driplaudary/admin.php';
+    $_SERVER['SCRIPT_NAME'] = ($argv[1] ?? '') === 'root' ? '/admin.php' : '/Driplaudary/admin.php';
     $_SERVER['REQUEST_METHOD'] = 'GET';
     ownerSession();
+    $expectedCookiePath = ($argv[1] ?? '') === 'root' ? '/' : '/Driplaudary/';
+    if (session_get_cookie_params()['path'] !== $expectedCookiePath) throw new RuntimeException('Owner cookie path does not match deployment directory.');
     ownerAuthenticate();
     session_write_close();
     ob_start();
