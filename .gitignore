@@ -1,0 +1,17 @@
+/private/*
+!/private/.htaccess
+/tmp/
+/output/
+/dist/
+*.lock
+*.log
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite3
+*.db
+.DS_Store
+Thumbs.db
+node_modules/
+/vendor/
