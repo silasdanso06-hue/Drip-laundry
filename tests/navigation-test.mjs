@@ -165,8 +165,8 @@ async function exercise(protocol, signedIn = false, mode = 'live', itemId = 'ite
     }
     navigate('pricing');
     const priceRows = document.querySelectorAll('[data-price-item]');
-    assert.deepEqual(priceRows.slice(0, 3).map(row => row.dataset.priceItem), ['load-6kg', 'load-7kg', 'load-8kg'], 'Weight packages must appear before the individual-item tables.');
-    assert.equal(document.querySelectorAll('#weightPrices').length, 1, 'Weight prices should appear once.');
+    assert.equal(document.querySelectorAll('#weightPrices').length, 0, 'Removed weight packages must not appear.');
+    assert.equal(document.querySelector('#weightPriceGroups').hidden, true, 'Empty weight section must be hidden.');
     assert.equal(priceRows.length, liveCatalog.length, 'Every saved item should render exactly once.');
     if (edited) {
         const row = priceRows.find(row => row.dataset.priceItem === itemId);
@@ -217,6 +217,6 @@ async function exercise(protocol, signedIn = false, mode = 'live', itemId = 'ite
     return `${protocol} / ${signedIn ? 'customer' : 'guest'} / ${mode} / ${itemId}${edited ? ' edited' : ''}: navigation, item details and checkout passed`;
 }
 
-export const results = [await exercise('file:'), await exercise('http:'), await exercise('http:', true), await exercise('http:', true, 'test'), await exercise('http:', true, 'live', 'load-6kg'), await exercise('http:', true, 'live', 'load-7kg'), await exercise('http:', true, 'live', 'load-8kg'), await exercise('http:', true, 'live', 'item-1-2', true), await exercise('http:', true, 'live', 'load-6kg', true)];
+export const results = [await exercise('file:'), await exercise('http:'), await exercise('http:', true), await exercise('http:', true, 'test'), await exercise('http:', true, 'live', 'item-1-2', true)];
 results.push(await exercise('http:', true, 'live', 'item-1-2', false, true));
 results.push(await exercise('http:', true, 'live', 'item-1-2', false, false, true));
