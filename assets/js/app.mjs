@@ -229,6 +229,7 @@ function renderPrices() {
     const loadHost = $('#weightPriceGroups');
     const itemHost = $('#itemPriceGroups');
     loadHost.replaceChildren();
+    loadHost.hidden = !catalog.some(item => item.unit === 'load');
     itemHost.replaceChildren();
     priceGroups(catalog.filter(item => item.unit === 'load')).forEach(([category, items], index) => {
         const card = priceCard(category, items, true);
@@ -250,8 +251,9 @@ function renderPrices() {
     }
     document.querySelectorAll('[data-from-service]').forEach(summary => {
         const values = catalog.map(item => item[summary.dataset.fromService]).filter(Number.isFinite);
+        const startingPrice = summary.dataset.startingPrice === undefined ? Math.min(...values) : Number(summary.dataset.startingPrice);
         summary.replaceChildren();
-        summary.textContent = values.length ? `From ${money(Math.min(...values))} ` : 'Contact us';
+        summary.textContent = values.length ? `From ${money(startingPrice)} ` : 'Contact us';
         if (values.length) summary.append(element('small', '/ item'));
     });
 }

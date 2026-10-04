@@ -287,30 +287,6 @@ const EMBEDDED_CATALOG = [
         "iron": 15
     },
     {
-        "id": "load-6kg",
-        "category": "Laundry by weight",
-        "name": "6 kg load",
-        "fold": 50,
-        "iron": null,
-        "unit": "load"
-    },
-    {
-        "id": "load-7kg",
-        "category": "Laundry by weight",
-        "name": "7 kg load",
-        "fold": 60,
-        "iron": null,
-        "unit": "load"
-    },
-    {
-        "id": "load-8kg",
-        "category": "Laundry by weight",
-        "name": "8 kg load",
-        "fold": 70,
-        "iron": null,
-        "unit": "load"
-    },
-    {
         "id": "item-2-1",
         "category": "Doormats & shoes",
         "name": "Doormat",
@@ -622,6 +598,7 @@ function renderPrices() {
     const loadHost = $('#weightPriceGroups');
     const itemHost = $('#itemPriceGroups');
     loadHost.replaceChildren();
+    loadHost.hidden = !catalog.some(item => item.unit === 'load');
     itemHost.replaceChildren();
     priceGroups(catalog.filter(item => item.unit === 'load')).forEach(([category, items], index) => {
         const card = priceCard(category, items, true);
@@ -643,8 +620,9 @@ function renderPrices() {
     }
     document.querySelectorAll('[data-from-service]').forEach(summary => {
         const values = catalog.map(item => item[summary.dataset.fromService]).filter(Number.isFinite);
+        const startingPrice = summary.dataset.startingPrice === undefined ? Math.min(...values) : Number(summary.dataset.startingPrice);
         summary.replaceChildren();
-        summary.textContent = values.length ? `From ${money(Math.min(...values))} ` : 'Contact us';
+        summary.textContent = values.length ? `From ${money(startingPrice)} ` : 'Contact us';
         if (values.length) summary.append(element('small', '/ item'));
     });
 }
