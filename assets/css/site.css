@@ -157,7 +157,7 @@ h2 em {
 }
 .cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 23px;
 }
 .card, .panel {
@@ -188,6 +188,7 @@ h2 em {
     content: '\1FAE7';
 }
 .card.wash-fold-card::before,
+.card.wash-iron-card::before,
 .card.delicate-care-card::before {
     display: none;
 }
