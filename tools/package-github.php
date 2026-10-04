@@ -14,6 +14,8 @@ foreach (glob($root . '/*') as $file) {
 foreach (['assets', 'lib', 'tests', 'tools'] as $directory) {
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/' . $directory, FilesystemIterator::SKIP_DOTS));
     foreach ($iterator as $file) {
+        $relative = str_replace('\\', '/', substr($file->getPathname(), strlen($root) + 1));
+        if (preg_match('~(?:^|/)(?:tmp|output|dist|private|\.git|node_modules|vendor)(?:/|$)~', $relative)) continue;
         if (!$file->isFile() || !in_array(strtolower($file->getExtension()), ['php', 'html', 'css', 'js', 'mjs', 'json', 'png', 'jpg', 'mp4', 'md', 'txt', 'ps1', 'py'], true)) continue;
         $files[] = $file->getPathname();
     }
