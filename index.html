@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -66,7 +66,13 @@
                     <img class="service-photo" src="assets/images/wash-fold-clothes.png" alt="Fresh clothes arranged on wooden hangers" width="1013" height="525" loading="lazy">
                     <b>◉ &nbsp; Wash &amp; fold</b>
                     <p>Everyday clothes washed, dried, and folded neatly, ready to put away.</p>
-                    <div class="price" data-from-service="fold">From GH₵ 4 <small>/ item</small></div>
+                    <div class="price" data-from-service="fold" data-starting-price="5">From GH₵ 5.00 <small>/ item</small></div>
+                </article>
+                <article class="card wash-iron-card">
+                    <img class="service-photo" src="assets/images/wash-iron-service.png" alt="Green iron pressing a light-coloured shirt" width="407" height="272" loading="lazy">
+                    <b>✦ &nbsp; Wash &amp; iron</b>
+                    <p>Clothes washed and neatly ironed, ready to look their best.</p>
+                    <div class="price"><a href="tel:0508103264">Contact us <small>for pricing</small></a></div>
                 </article>
                 <article class="card delicate-care-card">
                     <img class="service-photo" src="assets/images/delicate-care-photo.png" alt="Carefully inspecting a garment beside a laundry drying rack" width="405" height="607" loading="lazy" style="object-position: center 40%">
@@ -88,20 +94,8 @@
             <a class="btn" href="#cart">View your cart <span id="pricingCartCount">(0)</span> →</a>
             <span id="pricingNotice" role="status">Choose the price for the wash service you want.</span>
         </div>
-        <div id="weightPriceGroups">
-        <article class="price-card weight-prices" id="weightPrices">
-            <table>
-                <caption>Wash &amp; fold by weight</caption>
-                <thead><tr><th scope="col">Load weight</th><th scope="col">Price per load</th></tr></thead>
-                <tbody>
-                    <tr data-price-item="load-6kg"><th scope="row">6 kg load</th><td><button type="button" class="add-price" data-item="load-6kg" data-service="fold" aria-label="Add 6 kg wash and fold load for 50 Ghana cedis">GH₵ 50.00<span>+ Add</span></button></td></tr>
-                    <tr data-price-item="load-7kg"><th scope="row">7 kg load</th><td><button type="button" class="add-price" data-item="load-7kg" data-service="fold" aria-label="Add 7 kg wash and fold load for 60 Ghana cedis">GH₵ 60.00<span>+ Add</span></button></td></tr>
-                    <tr data-price-item="load-8kg"><th scope="row">8 kg load</th><td><button type="button" class="add-price" data-item="load-8kg" data-service="fold" aria-label="Add 8 kg wash and fold load for 70 Ghana cedis">GH₵ 70.00<span>+ Add</span></button></td></tr>
-                </tbody>
-            </table>
-        </article>
-        </div>
-        <div class="pricing-grid" id="itemPriceGroups"><div class="pricing-column"><article class="price-card"><table><caption>Men’s wear</caption><thead><tr><th scope="col">Item</th><th scope="col">Wash &amp; fold</th></tr></thead><tbody><tr data-price-item="item-1-1"><th scope="row">Joggers light weight</th><td><button type="button" class="add-price" data-item="item-1-1" data-service="fold" aria-label="Add Joggers light weight, Men’s wear, wash and fold">GH₵ 7.00<span>+ Add</span></button></td></tr>
+        <div id="weightPriceGroups" hidden></div>
+<div class="pricing-grid" id="itemPriceGroups"><div class="pricing-column"><article class="price-card"><table><caption>Men’s wear</caption><thead><tr><th scope="col">Item</th><th scope="col">Wash &amp; fold</th></tr></thead><tbody><tr data-price-item="item-1-1"><th scope="row">Joggers light weight</th><td><button type="button" class="add-price" data-item="item-1-1" data-service="fold" aria-label="Add Joggers light weight, Men’s wear, wash and fold">GH₵ 7.00<span>+ Add</span></button></td></tr>
 <tr data-price-item="item-1-2"><th scope="row">T-Shirt</th><td><button type="button" class="add-price" data-item="item-1-2" data-service="fold" aria-label="Add T-Shirt, Men’s wear, wash and fold">GH₵ 4.00<span>+ Add</span></button></td></tr>
 <tr data-price-item="item-1-3"><th scope="row">Jeans Trouser</th><td><button type="button" class="add-price" data-item="item-1-3" data-service="fold" aria-label="Add Jeans Trouser, Men’s wear, wash and fold">GH₵ 10.00<span>+ Add</span></button></td></tr>
 <tr data-price-item="item-1-4"><th scope="row">Jeans Short</th><td><button type="button" class="add-price" data-item="item-1-4" data-service="fold" aria-label="Add Jeans Short, Men’s wear, wash and fold">GH₵ 7.00<span>+ Add</span></button></td></tr>
@@ -321,6 +315,6 @@
 </footer>
 <div class="toast" id="toast" role="status">
 </div>
-<script src="assets/js/app.js?v=20261003-doormat-shoe" defer></script>
+<script src="assets/js/app.js?v=20261003-no-weight" defer></script>
 </body>
 </html>
